@@ -1,11 +1,7 @@
 pipeline {
     agent any
     stages {
-        stage('Clone Repository') {
-            steps {
-                bat 'https://github.com/swatimry/task7jenkins_flask.git'
-            }
-        }
+       
         stage('Install Dependencies') {
             steps {
                 bat 'pip install -r requirements.txt'
