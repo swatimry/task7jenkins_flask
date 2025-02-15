@@ -13,6 +13,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
+                sh 'git --version'
                 sh 'rm -rf task7jenkins_flask || true'
                 sh 'git clone -b main https://github.com/swatimry/task7jenkins_flask.git'
                 echo "Repository cloned successfully."
