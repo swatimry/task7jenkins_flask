@@ -1,16 +1,19 @@
 pipeline {
     agent any
+    environment {
+        PYTHON_PATH = 'C:\\Users\\ASUS\\AppData\\Local\\Programs\\Python\\Python313'
+        PIP_PATH = 'C:\\Users\\ASUS\\AppData\\Local\\Programs\\Python\\Python313\\Scripts'
+    }
     stages {
-       
         stage('Install Dependencies') {
             steps {
-                bat 'pip install -r requirements.txt'
+                bat 'set PATH=%PYTHON_PATH%;%PIP_PATH%;%PATH% && python -m pip install -r requirements.txt'
             }
         }
        
         stage('Run Flask Application') {
             steps {
-                bat 'start /B python app.py'
+                bat 'set PATH=%PYTHON_PATH%;%PIP_PATH%;%PATH% && start /B python app.py'
             }
         }
         stage('Confirmation') {
