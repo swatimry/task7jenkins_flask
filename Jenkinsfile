@@ -5,23 +5,34 @@ pipeline {
         FLASK_PORT = "5000"
         VENV_PATH = "venv"
     }
+    triggers {
+        pollSCM('H/5 * * * *')  
+    }
+
+
     stages {
-        stage('Checkout Code') {
+        stage('Clone Repository') {
             steps {
-                checkout scm  
+                sh 'rm -rf task7jenkins_flask || true'
+                sh 'git clone -b main https://github.com/swatimry/task7jenkins_flask.git'
+                echo "Repository cloned successfully."
             }
         }
 
         stage('Set Up Virtual Environment') {
             steps {
-                sh 'python3 -m venv ${VENV_PATH}'
-                sh '. ${VENV_PATH}/bin/activate'  
+                dir('task7jenkins_flask') {
+                    sh 'python3 -m venv ${VENV_PATH}'
+                    sh '. ${VENV_PATH}/bin/activate'  
+                }
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                sh '. ${VENV_PATH}/bin/activate && pip install -r requirements.txt'
+                dir('task7jenkins_flask') {
+                    sh '. ${VENV_PATH}/bin/activate && pip install -r requirements.txt'
+                }
             }
         }
 
@@ -32,13 +43,19 @@ pipeline {
                 }
             }
         }
-
         stage('Run Flask App') {
-            steps {
-                sh ". ${VENV_PATH}/bin/activate && nohup python app.py --port=${FLASK_PORT} > flask.log 2>&1 &"
-                sleep 5  
-                sh "tail -f flask.log"  
+             steps {
+                dir('task7jenkins_flask') {
+                  sh """
+                  . ${VENV_PATH}/bin/activate 
+                  setsid python app.py --port=${FLASK_PORT} > flask.log 2>&1 &
+                  """
+                  sleep 5  
+                  sh "tail -n 20 flask.log"  
+                }
             }
-        }
+       }
+
+        
     }
 }
